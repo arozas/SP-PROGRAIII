@@ -1,6 +1,8 @@
 <?php
 require_once './models/Client.php';
 require_once './services/ClientService.php';
+require_once './interfaces/IApiUse.php';
+
 class ClientController implements IApiUse
 {
     public function Add($request, $response, $args)

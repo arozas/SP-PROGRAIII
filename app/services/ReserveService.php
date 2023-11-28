@@ -1,12 +1,17 @@
 <?php
-
+require_once './database/DataAccessObject.php';
+require_once './models/Reserve.php';
+require_once './models/DTOs/ClientDTO.php';
+require_once './enums/ERoomType.php';
+require_once './enums/EReserveStatus.php';
 class ReserveService
 {
     public static function Add($reserve)
     {
         $DAO = DataAccessObject::getInstance();
         $request = $DAO->prepareRequest("INSERT INTO reserves 
-                                            (clientType, 
+                                            (clientId,
+                                             clientType, 
                                              checkInDate, 
                                              checkOutDate, 
                                              roomType, 
@@ -14,7 +19,8 @@ class ReserveService
                                              status,
                                              active,
                                              modifiedDate)
-                                            VALUES (:clientType, 
+                                            VALUES (:clientId,
+                                                    :clientType, 
                                                     :checkInDate, 
                                                     :checkOutDate, 
                                                     :roomType, 
@@ -23,11 +29,11 @@ class ReserveService
                                                     true,
                                                     :modifiedDate
                                                     )");
-
-        $request->bindValue(':clientType', $reserve->clientType, PDO::PARAM_STR);
-        $request->bindValue(':checkInDate', date_format($reserve->checkInDate, 'Y-m-d H:i:s'));
-        $request->bindValue(':checkOutDate', date_format($reserve->checkOutDate, 'Y-m-d H:i:s'));
-        $request->bindValue(':roomType', $reserve->roomType, PDO::PARAM_STR);
+        $request->bindValue(':clientId', $reserve->clientId, PDO::PARAM_INT);
+        $request->bindValue(':clientType', $reserve->clientType, PDO::PARAM_INT);
+        $request->bindValue(':checkInDate', date_format(new DateTime($reserve->checkInDate), 'Y-m-d H:i:s'));
+        $request->bindValue(':checkOutDate', date_format(new DateTime($reserve->checkOutDate), 'Y-m-d H:i:s'));
+        $request->bindValue(':roomType', $reserve->roomType, PDO::PARAM_INT);
         $request->bindValue(':price', $reserve->price, PDO::PARAM_STR);
         $request->bindValue(':status', $reserve->status, PDO::PARAM_INT);
         $date = new DateTime(date("d-m-Y"));
@@ -41,7 +47,20 @@ class ReserveService
     public static function Get($id)
     {
         $DAO = DataAccessObject::getInstance();
-        $request = $DAO->prepareRequest("SELECT * FROM reserves WHERE id = :id");
+        $request = $DAO->prepareRequest("SELECT A.id,
+                                                   clientId,
+                                                   B.description AS clientType,
+                                                   checkInDate,
+                                                   checkOutDate,
+                                                   C.description AS roomType,
+                                                   price,
+                                                   status
+                                                   FROM segundo_parcial.reserves AS A
+                                                   INNER JOIN segundo_parcial.client_types AS B
+                                                       ON A.clientType = B.id
+                                                   INNER JOIN segundo_parcial.room_types AS C
+                                                       ON A.roomType = C.id
+                                                   WHERE A.id = :id AND active = true");
         $request->bindValue(':id', $id, PDO::PARAM_INT);
         $request->execute();
 
@@ -51,7 +70,20 @@ class ReserveService
     public static function GetAll()
     {
         $DAO = DataAccessObject::getInstance();
-        $request = $DAO->prepareRequest("SELECT * FROM reserves WHERE active = true");
+        $request = $DAO->prepareRequest("SELECT A.id,
+                                                   clientId,
+                                                   B.description AS clientType,
+                                                   checkInDate,
+                                                   checkOutDate,
+                                                   C.description AS roomType,
+                                                   price,
+                                                   status
+                                                   FROM segundo_parcial.reserves AS A
+                                                   INNER JOIN segundo_parcial.client_types AS B
+                                                       ON A.clientType = B.id
+                                                   INNER JOIN segundo_parcial.room_types AS C
+                                                       ON A.roomType = C.id
+                                                   WHERE active = true");
         $request->execute();
 
         return $request->fetchAll(PDO::FETCH_CLASS, 'Reserve');
@@ -87,5 +119,20 @@ class ReserveService
         $request->bindValue(':status', $reserve->status, PDO::PARAM_INT);
 
         $request->execute();
+    }
+
+    public static function ValidateRoomType($roomType)
+    {
+        $lowercaseType = strtolower($roomType);
+
+        if ($lowercaseType === 'simple') {
+            return ERoomType::SIMPLE->value;
+        } elseif ($lowercaseType === 'doble') {
+            return ERoomType::DOUBLE->value;
+        } elseif ($lowercaseType === 'suite') {
+            return ERoomType::SUITE->value;
+        } else {
+            return 0;
+        }
     }
 }

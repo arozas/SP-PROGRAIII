@@ -2,6 +2,8 @@
 
 require_once './models/Reserve.php';
 require_once './services/ReserveService.php';
+require_once './services/ClientService.php';
+require_once './interfaces/IApiUse.php';
 
 class ReserveController implements IApiUse
 {
@@ -9,24 +11,24 @@ class ReserveController implements IApiUse
     {
         $parameters = $request->getParsedBody();
 
-        $clientType = $parameters['clientType'];
         $clientId = $parameters['clientId'];
+        $clientType = ClientService::ValidateType($parameters['clientType']);
         $checkInDate = $parameters['checkInDate'];
         $checkOutDate = $parameters['checkOutDate'];
-        $roomType = $parameters['roomType'];
+        $roomType = ReserveService::ValidateRoomType($parameters['roomType']);
         $totalAmount = $parameters['totalAmount'];
 
         $client = ClientService::Get($clientId);
 
-        if (!$client) {
+        if (!$client || $clientType == 0) {
             $payload = json_encode(array("error" => "Cliente no encontrado en la base de datos"));
             $response->getBody()->write($payload);
             return $response
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus(400);
         }
-
         $reserve = new Reserve();
+        $reserve->clientId = $clientId;
         $reserve->clientType = $clientType;
         $reserve->checkInDate = $checkInDate;
         $reserve->checkOutDate = $checkOutDate;

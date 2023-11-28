@@ -1,5 +1,4 @@
 <?php
-require_once './interfaces/IApiUse.php';
 require_once './database/DataAccessObject.php';
 require_once './models/Client.php';
 require_once './models/DTOs/ClientDTO.php';
@@ -158,6 +157,7 @@ class ClientService
             return 0;
         }
     }
+
     public static function ValidateDocumentType($documentType)
     {
         $lowercaseType = strtolower($documentType);
