@@ -95,8 +95,17 @@ class ReserveController implements IApiUse
             $updated = false;
 
             if (isset($parameters['clientType'])) {
-                $updated = true;
-                $reserve->clientType = $parameters['clientType'];
+                $clientType = ClientService::ValidateType($parameters['clientType']);
+                if($clientType != 0)
+                {
+                    $updated = true;
+                    $reserve->clientType = $clientType;
+                }else{
+                    $payload = json_encode(array("error" => "Tipo de cliente incorrecto"));
+                    $response->getBody()->write($payload);
+                    return $response
+                        ->withHeader('Content-Type', 'application/json');
+                }
             }
             if (isset($parameters['checkInDate'])) {
                 $updated = true;
@@ -107,16 +116,34 @@ class ReserveController implements IApiUse
                 $reserve->checkOutDate = $parameters['checkOutDate'];
             }
             if (isset($parameters['roomType'])) {
-                $updated = true;
-                $reserve->roomType = $parameters['roomType'];
+                $roomType = ReserveService::ValidateRoomType($parameters['roomType']);
+                if ($roomType != 0)
+                {
+                    $updated = true;
+                    $reserve->roomType = $roomType;
+                }else{
+                    $payload = json_encode(array("error" => "Tipo de habitación incorrecto"));
+                    $response->getBody()->write($payload);
+                    return $response
+                        ->withHeader('Content-Type', 'application/json');
+                }
             }
             if (isset($parameters['price'])) {
                 $updated = true;
                 $reserve->price = $parameters['price'];
             }
             if (isset($parameters['status'])) {
-                $updated = true;
-                $reserve->status = $parameters['status'];
+                $roomStatus = ReserveService::ValidateRoomStatus($parameters['status']);
+                if($roomStatus != 0)
+                {
+                    $updated = true;
+                    $reserve->status = $roomStatus;
+                }else{
+                    $payload = json_encode(array("error" => "Tipo de habitación incorrecto"));
+                    $response->getBody()->write($payload);
+                    return $response
+                        ->withHeader('Content-Type', 'application/json');
+                }
             }
 
             if ($updated) {

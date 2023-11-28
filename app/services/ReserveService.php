@@ -54,12 +54,14 @@ class ReserveService
                                                    checkOutDate,
                                                    C.description AS roomType,
                                                    price,
-                                                   status
+                                                   D. description AS status
                                                    FROM segundo_parcial.reserves AS A
                                                    INNER JOIN segundo_parcial.client_types AS B
                                                        ON A.clientType = B.id
                                                    INNER JOIN segundo_parcial.room_types AS C
                                                        ON A.roomType = C.id
+                                                   INNER JOIN segundo_parcial.reserve_status AS D
+                                                       ON A.status = D.id
                                                    WHERE A.id = :id AND active = true");
         $request->bindValue(':id', $id, PDO::PARAM_INT);
         $request->execute();
@@ -77,12 +79,14 @@ class ReserveService
                                                    checkOutDate,
                                                    C.description AS roomType,
                                                    price,
-                                                   status
+                                                   D. description AS status
                                                    FROM segundo_parcial.reserves AS A
                                                    INNER JOIN segundo_parcial.client_types AS B
                                                        ON A.clientType = B.id
                                                    INNER JOIN segundo_parcial.room_types AS C
                                                        ON A.roomType = C.id
+                                                   INNER JOIN segundo_parcial.reserve_status AS D
+                                                       ON A.status = D.id
                                                    WHERE active = true");
         $request->execute();
 
@@ -131,6 +135,20 @@ class ReserveService
             return ERoomType::DOUBLE->value;
         } elseif ($lowercaseType === 'suite') {
             return ERoomType::SUITE->value;
+        } else {
+            return 0;
+        }
+    }
+    public static function ValidateRoomStatus($roomType)
+    {
+        $lowercaseType = strtolower($roomType);
+
+        if ($lowercaseType === 'cancelada') {
+            return EReserveStatus::CANCELED->value;
+        } elseif ($lowercaseType === 'reservada') {
+            return EReserveStatus::RESERVED->value;
+        } elseif ($lowercaseType === 'ocupada') {
+            return EReserveStatus::OCUPIED->value;
         } else {
             return 0;
         }
