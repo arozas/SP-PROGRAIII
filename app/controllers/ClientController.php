@@ -7,7 +7,10 @@ class ClientController implements IApiUse
 {
     public function Add($request, $response, $args)
     {
+
         $parameters = $request->getParsedBody();
+        $uploadedFiles = $request->getUploadedFiles();
+
         $clientName = $parameters['nombre'];
         $clientSurname = $parameters['apellido'];
         $clientType = ClientService::ValidateType($parameters['tipoCliente']);
@@ -19,7 +22,7 @@ class ClientController implements IApiUse
         $clientPhone = $parameters['telefono'];
         $paymentMethod = ClientService::ValidatePaymentMethod($parameters['tipoPago']);
 
-        echo($clientType);
+
 
         $client = new Client();
         $client->name = $clientName;
@@ -32,6 +35,12 @@ class ClientController implements IApiUse
         $client->city = $clientCity;
         $client->phone = $clientPhone;
         $client->paymentMethod = $paymentMethod;
+
+        if (isset($uploadedFiles['fotoCliente'])) {
+            $targetPath = './ImagenesDeClientes/2023/'. $documentNumber . $parameters['tipoCliente'] . '.jpg';
+            $uploadedFiles['fotoCliente']->moveTo($targetPath);
+            $client->clientImage = $targetPath;
+        }
 
         ClientService::Add($client);
         $payload = json_encode(array("mensaje" => "Cliente creado con exito"));

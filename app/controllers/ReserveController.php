@@ -9,7 +9,10 @@ class ReserveController implements IApiUse
 {
     public function Add($request, $response, $args)
     {
+        $IdPlaceholder = rand(1, 99);
         $parameters = $request->getParsedBody();
+        $uploadedFiles = $request->getUploadedFiles();
+
 
         $clientId = $parameters['clientId'];
         $clientType = ClientService::ValidateType($parameters['clientType']);
@@ -35,6 +38,11 @@ class ReserveController implements IApiUse
         $reserve->roomType = $roomType;
         $reserve->price = $totalAmount;
         $reserve->status = EReserveStatus::RESERVED->value;
+        if (isset($uploadedFiles['fotoReserva'])) {
+            $targetPath = './ImagenesDeReservas/2023/'. $clientId . $IdPlaceholder . '.jpg';
+            $uploadedFiles['fotoReserva']->moveTo($targetPath);
+            $reserve->reserveImage = $targetPath;
+        }
 
         $reserveId = ReserveService::Add($reserve);
 

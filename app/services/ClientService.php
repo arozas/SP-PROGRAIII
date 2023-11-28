@@ -21,7 +21,8 @@ class ClientService
                                                                  city, 
                                                                  phone, 
                                                                  paymentMethod, 
-                                                                 active, 
+                                                                 clientImage,
+                                                                 active,
                                                                  modifiedDate) 
                                                         VALUES (:name, 
                                                                 :surname, 
@@ -33,10 +34,9 @@ class ClientService
                                                                 :city, 
                                                                 :phone, 
                                                                 :paymentMethod,
+                                                                :clientImage,
                                                                 true,
                                                                 :modifiedDate)");
-        //$passHash = password_hash($user->password, PASSWORD_DEFAULT);
-        //$request->bindValue(':password', $passHash);
         $request->bindValue(':name', $client->name, PDO::PARAM_STR);
         $request->bindValue(':surname', $client->surname, PDO::PARAM_STR);
         $request->bindValue(':documentType', $client->documentType, PDO::PARAM_INT);
@@ -47,6 +47,7 @@ class ClientService
         $request->bindValue(':city', $client->city, PDO::PARAM_STR);
         $request->bindValue(':phone', $client->phone, PDO::PARAM_STR);
         $request->bindValue(':paymentMethod', $client->paymentMethod, PDO::PARAM_INT);
+        $request->bindValue(':clientImage', $client->clientImage, PDO::PARAM_STR);
         $date = new DateTime(date("d-m-Y"));
         $request->bindValue(':modifiedDate', date_format($date, 'Y-m-d H:i:s'));
         $request->execute();

@@ -17,6 +17,8 @@ require_once './database/DataAccessObject.php';
 require_once './controllers/ClientController.php';
 require_once './controllers/ReserveController.php';
 
+// Set Timezone
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 // Load ENV
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -52,7 +54,8 @@ $app->group('/clients', function (RouteCollectorProxy $group) {
     $group->put('/{id}', ClientController::class . ':Update');
     $group->delete('/{id}', ClientController::class . ':Delete');
 });
-//Clients
+
+//Reserves
 $app->group('/reserves', function (RouteCollectorProxy $group) {
     $group->get('[/]', ReserveController::class . ':GetAll');
     $group->get('/{id}', ReserveController::class . ':Get');

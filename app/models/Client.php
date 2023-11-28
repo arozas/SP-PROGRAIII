@@ -13,6 +13,5 @@ class Client
     public $city;
     public $phone;
     public $paymentMethod;
-
-
+    public $clientImage;
 }

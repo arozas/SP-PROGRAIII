@@ -10,4 +10,5 @@ class Reserve
     public $roomType;
     public $price;
     public $status;
+    public $reserveImage;
 }

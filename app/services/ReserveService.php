@@ -17,7 +17,8 @@ class ReserveService
                                              roomType, 
                                              price, 
                                              status,
-                                             active,
+                                             reserveImage,
+                                             active,                                             
                                              modifiedDate)
                                             VALUES (:clientId,
                                                     :clientType, 
@@ -26,6 +27,7 @@ class ReserveService
                                                     :roomType, 
                                                     :price, 
                                                     :status,
+                                                    :reserveImage,
                                                     true,
                                                     :modifiedDate
                                                     )");
@@ -36,6 +38,7 @@ class ReserveService
         $request->bindValue(':roomType', $reserve->roomType, PDO::PARAM_INT);
         $request->bindValue(':price', $reserve->price, PDO::PARAM_STR);
         $request->bindValue(':status', $reserve->status, PDO::PARAM_INT);
+        $request->bindValue(':reserveImage', $reserve->reserveImage, PDO::PARAM_STR);
         $date = new DateTime(date("d-m-Y"));
         $request->bindValue(':modifiedDate', date_format($date, 'Y-m-d H:i:s'));
 
@@ -110,17 +113,19 @@ class ReserveService
                                              checkOutDate = :checkOutDate,
                                              roomType = :roomType,
                                              price = :price,
-                                             status = :status
-                                         WHERE id = :id");
+                                             status = :status,
+                                             modifiedDate = :modifiedDate
+                                         WHERE id = :id and active = true");
 
         $request->bindValue(':id', $reserve->id, PDO::PARAM_INT);
-        $request->bindValue(':clientId', $reserve->clientId, PDO::PARAM_INT);
         $request->bindValue(':clientType', $reserve->clientType, PDO::PARAM_STR);
         $request->bindValue(':checkInDate', $reserve->checkInDate, PDO::PARAM_STR);
         $request->bindValue(':checkOutDate', $reserve->checkOutDate, PDO::PARAM_STR);
         $request->bindValue(':roomType', $reserve->roomType, PDO::PARAM_STR);
         $request->bindValue(':price', $reserve->price, PDO::PARAM_INT);
         $request->bindValue(':status', $reserve->status, PDO::PARAM_INT);
+        $date = new DateTime(date("d-m-Y"));
+        $request->bindValue(':modifiedDate', date_format($date, 'Y-m-d H:i:s'));
 
         $request->execute();
     }
