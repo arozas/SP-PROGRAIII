@@ -16,6 +16,8 @@ require_once './database/DataAccessObject.php';
 // require_once './middlewares/Logger.php';
 require_once './controllers/ClientController.php';
 require_once './controllers/ReserveController.php';
+require_once './controllers/ReportController.php';
+
 
 // Set Timezone
 date_default_timezone_set('America/Argentina/Buenos_Aires');
@@ -62,6 +64,20 @@ $app->group('/reserves', function (RouteCollectorProxy $group) {
     $group->post('[/]', ReserveController::class . ':Add');
     $group->put('/{id}', ReserveController::class . ':Update');
     $group->delete('/{id}', ReserveController::class . ':Delete');
+});
+
+// Reports
+$app->group('/reports', function (RouteCollectorProxy $group) {
+    $group->get('/room_and_date[/{fecha}]', ReportController::class . ':GetAmountByRoomAndDate');
+    $group->get('/by_client/{clientId}', ReportController::class . ':GetReserveByClientId');
+    $group->get('/reserves_between_dates/{startDate}/{endDate}', ReportController::class . ':GetReservesBetweenDates');
+    $group->get('/by_rooms', ReportController::class . ':GetAllReservesByRoom');
+    $group->get('/cancelled-amount-by-client-and-date[/{fecha}]', ReportController::class . ':GetCancelledAmountByClientAndDate');
+    $group->get('/cancelled-reserves-by-client/{id}', ReportController::class . ':GetCancelledReservesByClientId');
+    $group->get('/cancelled-reserves-between-dates/{startDate}/{endDate}', ReportController::class . ':GetCancelledReservesBetweenDates');
+    $group->get('/cancelled-reserves-by-client-type', ReportController::class . ':GetCancelledReservesByClientType');
+    $group->get('/all-operations-by-user', ReportController::class . ':GetAllOperationsByUser');
+    $group->get('/reserves-by-modality/{modality}', ReportController::class . ':GetReservesByModality');
 });
 
 $app->get('[/]', function (Request $request, Response $response) {    
