@@ -12,10 +12,11 @@ use Slim\Routing\RouteContext;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-require_once './db/AccesoDatos.php';
+require_once './database/DataAccessObject.php';
 // require_once './middlewares/Logger.php';
-
 require_once './controllers/ClientController.php';
+
+
 
 // Load ENV
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -28,17 +29,31 @@ $app = AppFactory::create();
 $app->setBasePath('/app');
 
 // Add error middleware
-$app->addErrorMiddleware(true, true, true);
+$errorMiddleware = function ($request, $exception, $displayErrorDetails) use ($app) {
+    $statusCode = 500;
+    $errorMessage = $exception->getMessage();
+    $response = $app->getResponseFactory()->createResponse($statusCode);
+    $response->getBody()->write(json_encode(['error' => $errorMessage]));
+
+    return $response->withHeader('Content-Type', 'application/json');
+};
+$app->addErrorMiddleware(true, true, true)
+    ->setDefaultErrorHandler($errorMiddleware);;
 
 // Add parse body
 $app->addBodyParsingMiddleware();
 
 // Routes
-$app->group('/usuarios', function (RouteCollectorProxy $group) {
-  });
+$app->group('/clients', function (RouteCollectorProxy $group) {
+    $group->get('[/]', ClientController::class . ':GetAll');
+    $group->get('/{id}', ClientController::class . ':Get');
+    $group->post('[/]', ClientController::class . ':Add');
+    $group->put('/{id}', ClientController::class . ':Update');
+    $group->delete('/{id}', ClientController::class . ':Delete');
+});
 
 $app->get('[/]', function (Request $request, Response $response) {    
-    $payload = json_encode(array("mensaje" => "Slim Framework 4 PHP"));
+    $payload = json_encode(array("mensaje" => "Segundo Parcial."));
     
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');

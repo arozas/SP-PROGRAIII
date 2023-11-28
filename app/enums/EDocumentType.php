@@ -1,6 +1,6 @@
 <?php
 
-enum ClientType: int
+enum EDocumentType: int
 {
     case DNI = 1;
     case CUIL = 2;
