@@ -130,6 +130,16 @@ class ReserveService
         $request->execute();
     }
 
+    public static function SaveReserveAdjustment($reserve)
+    {
+        $DAO = DataAccessObject::getInstance();
+
+        $request = $DAO->prepareRequest("INSERT INTO reserve_adjustment (reserve_id, reserve_status) VALUES (:reserve_id, :reserve_status)");
+        $request->bindValue(':reserve_id', $reserve->id, PDO::PARAM_INT);
+        $request->bindValue(':reserve_status', $reserve->status, PDO::PARAM_INT);
+        $request->execute();
+    }
+
     public static function ValidateRoomType($roomType)
     {
         $lowercaseType = strtolower($roomType);

@@ -156,6 +156,7 @@ class ReserveController implements IApiUse
 
             if ($updated) {
                 ReserveService::Update($reserve);
+                ReserveService::SaveReserveAdjustment($reserve);
                 $payload = json_encode(array("mensaje" => "Reserva modificada con éxito"));
             } else {
                 $payload = json_encode(array("mensaje" => "Reserva no modificada por falta de campos"));
