@@ -111,11 +111,16 @@ class ReportController
 
     public function GetReservesByModality($request, $response, $args)
     {
-        $modality = $args['modality'];
+        $paymentMethod = ClientService::ValidatePaymentMethod($args['paymentMethod']);
 
-        $reservesByModality = ReportService::GetReservesByModality($modality);
+        if($paymentMethod != 0)
+        {
+            $reservesByModality = ReportService::GetReservesByModality($paymentMethod);
+            $payload = json_encode($reservesByModality);
+        }else{
+            $payload = json_encode(array("mensaje" => "El metodo de pago no existe"));
+        }
 
-        $payload = json_encode($reservesByModality);
 
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');

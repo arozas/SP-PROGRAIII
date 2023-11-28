@@ -1,5 +1,5 @@
 <?php
-
+require_once './enums/EReserveStatus.php';
 class ReportService
 {
     public static function GetAmountByRoomAndDate($fecha)
@@ -80,6 +80,7 @@ class ReportService
         return $request->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    //nuevos:
     public static function GetCancelledAmountByClientAndDate($fecha)
     {
         $DAO = DataAccessObject::getInstance();
@@ -219,28 +220,31 @@ class ReportService
         return $request->fetchAll(PDO::FETCH_CLASS, 'Reserve');
     }
 
-    public static function GetReservesByModality($modality)
+    public static function GetReservesByModality($paymentMethod)
     {
         $DAO = DataAccessObject::getInstance();
         $request = $DAO->prepareRequest("SELECT A.id,
-                                               clientId,
-                                               B.description AS clientType,
-                                               checkInDate,
-                                               checkOutDate,
-                                               C.description AS roomType,
-                                               price,
-                                               D.description AS status
-                                               FROM segundo_parcial.reserves AS A
-                                               INNER JOIN segundo_parcial.client_types AS B
-                                                   ON A.clientType = B.id
-                                               INNER JOIN segundo_parcial.room_types AS C
-                                                   ON A.roomType = C.id
-                                               INNER JOIN segundo_parcial.reserve_status AS D
-                                                   ON A.status = D.id
-                                               WHERE D.description = :modality
-                                               AND active = true");
+                                                    clientId,
+                                                    B.description AS clientType,
+                                                    checkInDate,
+                                                    checkOutDate,
+                                                    C.description AS roomType,
+                                                    price,
+                                                    D.description AS status
+                                            FROM segundo_parcial.reserves AS A
+                                                INNER JOIN segundo_parcial.client_types AS B
+                                                    ON A.clientType = B.id
+                                                INNER JOIN segundo_parcial.room_types AS C
+                                                    ON A.roomType = C.id
+                                                INNER JOIN segundo_parcial.reserve_status AS D
+                                                    ON A.status = D.id
+                                                INNER JOIN segundo_parcial.clients AS E
+                                                    ON A.clientId = E.id
+                                                INNER JOIN segundo_parcial.payment_types AS F
+                                                    ON E.paymentMethod = :paymentMethod
+                                                AND E.active = true");
 
-        $request->bindValue(':modality', $modality);
+        $request->bindValue(':paymentMethod', $paymentMethod);
 
         $request->execute();
 

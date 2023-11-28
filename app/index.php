@@ -77,7 +77,7 @@ $app->group('/reports', function (RouteCollectorProxy $group) {
     $group->get('/cancelled-reserves-between-dates/{startDate}/{endDate}', ReportController::class . ':GetCancelledReservesBetweenDates');
     $group->get('/cancelled-reserves-by-client-type', ReportController::class . ':GetCancelledReservesByClientType');
     $group->get('/all-operations-by-user', ReportController::class . ':GetAllOperationsByUser');
-    $group->get('/reserves-by-modality/{modality}', ReportController::class . ':GetReservesByModality');
+    $group->get('/reserves-by-payment-method/{paymentMethod}', ReportController::class . ':GetReservesByModality');
 });
 
 $app->get('[/]', function (Request $request, Response $response) {    
