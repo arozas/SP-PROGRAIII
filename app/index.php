@@ -15,7 +15,7 @@ require __DIR__ . '/../vendor/autoload.php';
 require_once './database/DataAccessObject.php';
 // require_once './middlewares/Logger.php';
 require_once './controllers/ClientController.php';
-
+require_once './controllers/ReserveController.php';
 
 
 // Load ENV
@@ -44,12 +44,21 @@ $app->addErrorMiddleware(true, true, true)
 $app->addBodyParsingMiddleware();
 
 // Routes
+//Clients
 $app->group('/clients', function (RouteCollectorProxy $group) {
     $group->get('[/]', ClientController::class . ':GetAll');
     $group->get('/{id}', ClientController::class . ':Get');
     $group->post('[/]', ClientController::class . ':Add');
     $group->put('/{id}', ClientController::class . ':Update');
     $group->delete('/{id}', ClientController::class . ':Delete');
+});
+//Clients
+$app->group('/reserves', function (RouteCollectorProxy $group) {
+    $group->get('[/]', ReserveController::class . ':GetAll');
+    $group->get('/{id}', ReserveController::class . ':Get');
+    $group->post('[/]', ReserveController::class . ':Add');
+    $group->put('/{id}', ReserveController::class . ':Update');
+    $group->delete('/{id}', ReserveController::class . ':Delete');
 });
 
 $app->get('[/]', function (Request $request, Response $response) {    

@@ -57,65 +57,51 @@ class ClientService
     public static function Get($id)
     {
         $DAO = DataAccessObject::getInstance();
-        $request = $DAO->prepareRequest("SELECT id,
-                                                    name, 
-                                                    surname, 
-                                                    documentType, 
-                                                    documentNumber, 
-                                                    email, 
-                                                    clientType, 
-                                                    country, 
-                                                    city, 
-                                                    phone, 
-                                                    paymentMethod FROM clients 
-                                                                  WHERE id = :id 
-                                                                  AND active = true");
+        $request = $DAO->prepareRequest("SELECT  A.id,
+                                                name,
+                                                surname,
+                                                B.description AS documentType,
+                                                documentNumber,
+                                                email,
+                                                CONCAT(C.description,'-',B.description) AS clientType,
+                                                country,
+                                                city,
+                                                phone,
+                                                D.description AS paymentMethod
+                                                              FROM clients AS A
+                                                              INNER JOIN id_types AS B ON A.documentType = B.id
+                                                              INNER JOIN client_types AS C ON A.clientType = C.id
+                                                              INNER JOIN payment_types AS D ON A.paymentMethod = D.id 
+                                                              WHERE A.id = :id 
+                                                              AND A.active = true");
         $request->bindValue(':id', $id, PDO::PARAM_STR);
         $request->execute();
 
-        $request->setFetchMode(PDO::FETCH_CLASS, 'ClientDTO');
-
-        $clientDTO = $request->fetch();
-
-        if($clientDTO)
-        {
-            //MAPEO la respuesta.
-            $clientDTO->documentType = $clientDTO->getDocumentTypeText();
-            $clientDTO->clientType = $clientDTO->getClientTypeText();
-            $clientDTO->paymentMethod = $clientDTO->getPaymentMethodText();
-        }
-
-        return $clientDTO;
+        return $request->fetchObject('ClientDTO');
     }
 
     public static function GetAll()
     {
         $DAO = DataAccessObject::getInstance();
-        $request = $DAO->prepareRequest("SELECT id,
-                                                    name, 
-                                                    surname, 
-                                                    documentType, 
-                                                    documentNumber, 
-                                                    email, 
-                                                    clientType, 
-                                                    country, 
-                                                    city, 
-                                                    phone, 
-                                                    paymentMethod FROM clients 
-                                                                  WHERE active = true");
+        $request = $DAO->prepareRequest("SELECT  A.id,
+                                                name,
+                                                surname,
+                                                B.description AS documentType,
+                                                documentNumber,
+                                                email,
+                                                CONCAT(C.description,'-',B.description) AS clientType,
+                                                country,
+                                                city,
+                                                phone,
+                                                D.description AS paymentMethod
+                                                              FROM clients AS A
+                                                              INNER JOIN id_types AS B ON A.documentType = B.id
+                                                              INNER JOIN client_types AS C ON A.clientType = C.id
+                                                              INNER JOIN payment_types AS D ON A.paymentMethod = D.id
+                                                              WHERE A.active = true");
         $request->execute();
 
-        $request->setFetchMode(PDO::FETCH_CLASS, 'ClientDTO');
-
-        $clients = $request->fetchAll();
-
-        foreach ($clients as $client) {
-            $client->documentType = $client->getDocumentTypeText();
-            $client->clientType = $client->getClientTypeText();
-            $client->paymentMethod = $client->getPaymentMethodText();
-        }
-
-        return $clients;
+        return $request->fetchAll(PDO::FETCH_CLASS, 'ClientDTO');
     }
 
     public static function Delete($id)
